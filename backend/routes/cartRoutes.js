@@ -1,12 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const authMiddleware = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 const Cart = require("../models/Cart");
 
 const router = express.Router();
 
 // GET /api/cart  (protected)
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
     const cart = await Cart.findOne({ user: req.user._id }).populate(
       "items.product"
@@ -18,7 +18,7 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 // POST /api/cart  (protected)  body: { productId, qty }
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", protect, async (req, res) => {
   try {
     const { productId, qty } = req.body || {};
     const quantity = Number(qty);

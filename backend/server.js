@@ -13,8 +13,14 @@ const seedRoutes = require("./routes/seedRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/api/health", (req, res) => {
   res.json({ message: "API is running" });
@@ -30,7 +36,6 @@ app.use((req, res) => {
   res.status(404).json({ message: `Route not found: ${req.originalUrl}` });
 });
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
   res.status(statusCode).json({
@@ -40,11 +45,15 @@ app.use((err, req, res, next) => {
 });
 
 const startServer = async () => {
-  await connectDB();
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error(`Failed to start server: ${error.message}`);
+    process.exit(1);
+  }
 };
 
 startServer();

@@ -1,11 +1,11 @@
 const express = require("express");
-const authMiddleware = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 const Order = require("../models/Order");
 
 const router = express.Router();
 
 // POST /api/orders (protected)
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", protect, async (req, res) => {
   try {
     const { orderItems, totalPrice } = req.body || {};
 
